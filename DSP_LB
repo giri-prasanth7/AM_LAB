@@ -1,0 +1,427 @@
+DSP CODES :
+
+EXP 1 –  IMPULSE , STEP , RAMP , SINE 
+
+clc;
+clear all;
+close all;
+%unit impulse
+figure
+n1=(-1:0.1:1);
+ui=n1==0;
+stem(n1,ui)
+grid on
+xlabel('time')
+ylabel('amplitude')
+title('unit impulse')
+
+%unit step
+n=-4:4;
+y=[zeros(1,4),ones(1,5)]
+figure
+stem(y)
+grid on
+xlabel('n')
+ylabel('amplitude')
+title('unit step function')
+
+%ramp function
+figure
+n2=0:10;
+stem(n2,n2)
+grid on;
+xlabel('n');
+ylabel('amplitude');
+title('unit ramp');
+
+%sine function
+t=-pi:0.1:pi;
+s1=sin(t)
+figure
+stem(s1)
+grid on
+xlabel('sec')
+ylabel('sin(t)')
+title('sin function');
+
+
+
+	Exp 2 – correlation 
+  
+  
+	% Define two discrete sequences
+x = [1 2 3 4 5];
+y = [5 4 3 2 1];
+% Calculate the length of the sequences
+N = length(x);
+% Calculate the autocorrelation of x
+for k = 1:N
+    rxx(k) = 0;
+    for n = 1:N-k+1
+        rxx(k) = rxx(k) + x(n)*x(n+k-1);
+    end
+end
+% Calculate the cross-correlation of x and y
+for k = 1:N
+    rxy(k) = 0;
+    for n = 1:N-k+1
+        rxy(k) = rxy(k) + x(n)*y(n+k-1);
+    end
+end
+% Plot the waveforms of autocorrelation and cross-correlation
+subplot(2,1,1);
+stem(rxx);
+title('Autocorrelation of x');
+xlabel('Lag');
+ylabel('Amplitude');
+subplot(2,1,2);
+stem(rxy);
+title('Cross-correlation of x and y');
+xlabel('Lag');
+ylabel('Amplitude');
+
+
+
+
+EXP 3 – CONVOLUTION  
+
+
+
+clc;
+clear all;
+close all;
+x=[1 2 1 2];
+subplot (3,2,1);
+stem(x,'linewidth',3,'color','b');
+title('sequence of x')
+h=[0.5 1 0.7 1]
+subplot(3,2,2);
+stem(h,'linewidth',3,'color','b');
+title('sequence of h')
+clin = conv(x,h);
+xpad=[x zeros(1,6-length(x))];
+hpad=[h zeros(1,6-length(h))];
+ccirc=ifft(fft(xpad).*fft(hpad));
+subplot(3,2,[3,4]);
+stem(clin,'filled')
+ylim([0 11])
+title('linear convolution of x and h')
+subplot(3,2,[5,6]);
+stem(ccirc,'filled')
+ylim([0 11])
+title('circular convolution of x and h')
+
+
+
+EXP 4 – STABILITY RESPONSE 
+
+
+	clc
+clear all
+close all
+num=[0.45,0.5,0.45]
+den=[1,-0.43,0.53]
+[z,p,k]=tf2zp(num,den)
+subplot(2,1,1)
+zplane(z,p)
+subplot(2,1,2)
+impz(num,den);
+%N=max(length(num),length(den));
+%[g,l]=impz(num,den,N+1);
+%stem(g)
+
+
+
+EXP 5 – DTFT
+
+
+clc
+clear all;
+close all;
+w=-4*pi:8*pi/511:4*pi;
+num=[2 1];den = [1 -0.6];
+h= freqz(num,den,w);
+subplot(4,1,1)
+plot(w/pi,real(h));grid
+title('real part of H')
+xlabel('\omega /\pi');
+ylabel('amplitde');
+subplot(4,1,2)
+plot(w/pi,imag(h));grid
+title('Imaginary part of H')
+xlabel('\omega/\pi');
+ylabel('amplitude');
+subplot(4,1,3)
+plot(w/pi,abs(h));grid
+title('Magnitude Spectrum')
+xlabel('\omega/\pi');
+ylabel('amplitude');
+subplot(4,1,4) 
+plot(w/pi,angle(h));grid
+title("Phase Spectrum")
+xlabel('\omega/\pi');
+ylabel("Phase , Radians");
+n = 0:511;
+x = real(ifft(n));
+figure
+stem(n, x)
+xlabel('n')
+ylabel('Amplitude')
+title('Inverse Discrete Fourier Transform (IDFT)')
+
+
+
+
+EXP 6 – DFT BY FFT
+
+
+clc;
+clear all;
+close all;
+n = [0:29];
+x = cos(2*pi*n/10);
+N1 = 64;
+N2 = 128;
+N3 = 256;
+X1 = abs(fft(x,N1));
+X2 = abs(fft(x,N2));
+X3 = abs(fft(x,N3));
+F1 = [0 : N1 - 1]/N1;
+F2 = [0 : N2 - 1]/N2;
+F3 = [0 : N3 - 1]/N3;
+subplot(3,1,1)
+plot(F1,X1,'-x'),title('N = 54'),axis([-0.5 0.5 0 20])
+subplot(3,1,2)
+plot(F2,X2,'-x'),title('N = 128'),axis([-0.5 0.5 0 20])
+subplot(3,1,3)
+plot(F3,X3,'-x'),title('N = 256'),axis([-0.5 0.5 0 20])
+
+% Program P6.3
+clc; clear all; close all;
+n = [0:149];
+x1 = cos(2*pi*n/10);
+N = 2048;
+X = abs(fft(x1,N));
+X = fftshift(X);
+F = [-N/2:N/2-1]/N;
+plot(F,X),
+xlabel('frequency / f_s')
+title('Spectrum');
+
+
+
+
+
+
+
+EXP 7 – LOW PASS BUTTERWORTH
+
+
+clf;
+Fp = 3500; 
+Fs = 4500;
+Wp = 2*pi*Fp; 
+Ws = 2*pi*Fs;
+[N, Wn] = buttord (Wp, Ws, 0.5, 30, 's');
+[b, a] = butter (N, Wn,'s');
+wa = 0: (3*Ws) /511:3*Ws;
+h = freqs (b, a, wa) ;
+plot (wa/ (2*pi), 20*log10 (abs (h) ));grid 
+xlabel ('Frequency, Hz');
+ylabel ( 'Gain, dB');
+title ('Gain response');
+axis ( [0 3*Fs -60 5]) ;
+
+
+
+
+EXP 8 – CHEBYSEV TYP 1 BANDPASS FILTER 
+
+
+clc;
+clear all;
+close all;
+fs = 100;
+
+t = (1:100)/fs;
+s1 = sin(2*pi*5*t);
+subplot(4,1,1);
+plot(t, s1);
+title('sl=sin(2*pi*5*t)');
+xlabel('Time')
+ylabel('Amplitude s2sin(2*pi*15 t');
+
+s2 = sin(2*pi*15*t);
+subplot(4,1,2);
+plot(t, s2);
+title('s2=sin(2*pi*15 t)')
+xlabel('Time');
+ylabel('Amplitude');
+
+s3 = sin(2*pi*30*t);
+subplot(4,1,3);
+plot(t, s3);
+title('s3=sin(2*pi*30*t)')
+xlabel('Time');
+ylabel('Amplitude');
+
+s = s1 + s2 + s3;
+subplot(4,1,4);
+plot(t, s);
+title('s1+s2+s3');
+xlabel('Time');
+ylabel('Amplitude');
+
+[b, a] = cheby1(4, 0.1, [10 20]*2/fs);
+
+[h, w] = freqz(b, a, 512);
+
+figure(2);
+plot(w*fs/(2*pi), abs(h));
+title('Response of filter');
+xlabel('Frequency (in Hz)');
+ylabel('Gain in dB');
+
+sf = filter(b, a, s);
+
+figure(3);
+subplot(2,1,1);
+plot(sf);
+title('filtered output');
+xlabel('Time');
+ylabel('Amplitude')
+
+s = fft(sf, 512);
+sf = fft(sf, 512);
+p = (0:255)/256*(fs/2);
+
+subplot(2,1,2);
+plot(p, abs([s(1:256)' sf(1:256)' ]));
+title('Frequency spectrum of filtered Signal');
+xlabel('Frequency in Hz');
+ylabel('PSD');
+
+
+
+EXP 9 – CHEBYSEV TYP 1 LOW PASS FILTER 
+
+clc;
+clear all;
+close all;
+fs = 100;
+
+t = (1:100)/fs;
+s1 = sin(2*pi*5*t);
+subplot(4,1,1);
+plot(t, s1);
+title('s1 = sin(2*pi*5*t)');
+xlabel('Time')
+ylabel('Amplitude')
+
+s2 = sin(2*pi*15*t);
+subplot(4,1,2);
+plot(t, s2);
+title('s2 = sin(2*pi*15*t)')
+xlabel('Time');
+ylabel('Amplitude');
+
+s3 = sin(2*pi*30*t);
+subplot(4,1,3);
+plot(t, s3);
+title('s3 = sin(2*pi*30*t)')
+xlabel('Time');
+ylabel('Amplitude');
+
+s = s1 + s2 + s3;
+subplot(4,1,4);
+plot(t, s);
+title('s = s1 + s2 + s3');
+xlabel('Time');
+ylabel('Amplitude');
+
+% Low-pass filter design
+fc = 200; % Cutoff frequency in Hz
+[b, a] = cheby2(4, 0.1, 0.3);
+
+[h, w] = freqz(b, a, 512);
+
+figure(2);
+plot(w*fs/(2*pi), abs(h));
+title('Response of the Low-pass Filter');
+xlabel('Frequency (in Hz)');
+ylabel('Gain');
+
+sf = filter(b, a, s);
+
+figure(3);
+subplot(2,1,1);
+plot(sf);
+title('Filtered Output');
+xlabel('Time');
+ylabel('Amplitude');
+
+spectrum = fft(sf, 512);
+p = (0:255)/256*(fs/2);
+
+subplot(2,1,2);
+plot(p, abs(spectrum(1:256)));
+title('Frequency Spectrum of Filtered Signal');
+xlabel('Frequency (in Hz)');
+
+
+xlabel('Frequency in Hz');
+ylabel('PSD');
+
+
+
+
+EXP 10 – FIR LOW PASS FILTER 
+
+
+clc;
+clear all;
+close all;
+% Filter specifications
+Fs = 1000;          % Sampling frequency (Hz)
+Fc = 100;           % Cutoff frequency (Hz)
+M = 101;            % Filter order (odd number)
+L = M + 1;          % Filter length
+
+% Generate the ideal lowpass filter impulse response
+n = 0:M;
+hd = (2*Fc/Fs) * sinc(2*Fc*(n-M/2)/Fs);
+
+% Design FIR filters using different windows
+h_hamming = hd .* hamming(L)';
+h_hanning = hd .* hann(L)';
+h_blackman = hd .* blackman(L)';
+
+% Compute the frequency response of the filters
+NFFT = 1024;
+f = (0:NFFT-1) * Fs/NFFT;
+H_hamming = fft(h_hamming, NFFT);
+H_hanning = fft(h_hanning, NFFT);
+H_blackman = fft(h_blackman, NFFT);
+
+% Compute the magnitude response in dB
+HdB_hamming = 20*log10(abs(H_hamming));
+HdB_hanning = 20*log10(abs(H_hanning));
+HdB_blackman = 20*log10(abs(H_blackman));
+
+% Plot the gain responses
+figure;
+plot(f, HdB_hamming, 'b', 'LineWidth', 1.5);
+hold on;
+plot(f, HdB_hanning, 'r', 'LineWidth', 1.5);
+plot(f, HdB_blackman, 'g', 'LineWidth', 1.5);
+grid on;
+xlabel('Frequency (Hz)');
+ylabel('Gain (dB)');
+legend('Hamming', 'Hanning', 'Blackman');
+title('Gain Response of Lowpass FIR Filters');
+
+% Set the x-axis limit to show only the relevant frequency range
+xlim([0, Fs/2]);
+
+
+
